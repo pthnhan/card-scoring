@@ -170,10 +170,14 @@ def submit_round():
 
     # Determine admin for this round
     round_index = len(game_state["rounds"])
-    if mode == "manual":
-        admin = manual_admin
-    else:
-        admin = get_admin_for_round(game_state, round_index)
+    admin = None
+    if mode != "none":
+        if manual_admin is not None:
+            if manual_admin not in valid_names:
+                return jsonify({"ok": False, "error": "Admin không hợp lệ"}), 400
+            admin = manual_admin
+        else:
+            admin = get_admin_for_round(game_state, round_index)
 
     # Zero-sum check (no-admin mode)
     if mode == "none":

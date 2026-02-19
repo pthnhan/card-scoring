@@ -22,6 +22,7 @@ function initials(name) {
 let state = null;
 let playerCount = 4;
 let manualAdminSelected = null;
+let currentAdminSelected = null;
 const page = document.body?.dataset?.page || '';
 
 // ── Initialise setup view ─────────────────────────────────────
@@ -179,6 +180,7 @@ function updateAdminBadge() {
 
     if (mode === 'none') {
         badge.classList.add('hidden');
+        currentAdminSelected = null;
         return;
     }
     badge.classList.remove('hidden');
@@ -196,21 +198,33 @@ function updateAdminBadge() {
             sel.value = state.players[0] || '';
         }
         manualAdminSelected = sel.value;
+        currentAdminSelected = sel.value;
     } else {
-        label.textContent = state.next_admin || '—';
+        const sec = document.getElementById('manual-admin-section');
+        sec.classList.remove('hidden');
+        const sel = document.getElementById('manual-admin-select');
+        sel.innerHTML = state.players.map(n => `<option value="${n}">${n}</option>`).join('');
+        sel.value = state.next_admin || state.players[0] || '';
+        currentAdminSelected = sel.value;
+        label.textContent = currentAdminSelected || '—';
     }
 }
 
 function getCurrentAdmin() {
     const mode = state.admin_mode;
     if (mode === 'none') return null;
-    if (mode === 'manual') return document.getElementById('manual-admin-select').value;
-    return state.next_admin;
+    if (currentAdminSelected) return currentAdminSelected;
+    const sel = document.getElementById('manual-admin-select');
+    return sel ? sel.value : state.next_admin;
 }
 
 function onManualAdminChange() {
     const sel = document.getElementById('manual-admin-select');
-    manualAdminSelected = sel ? sel.value : null;
+    const mode = state?.admin_mode;
+    currentAdminSelected = sel ? sel.value : null;
+    if (mode === 'manual') manualAdminSelected = currentAdminSelected;
+    const label = document.getElementById('admin-name-label');
+    if (label && mode !== 'manual') label.textContent = currentAdminSelected || '—';
     refreshScoringInputs();
 }
 
@@ -246,7 +260,7 @@ function refreshScoringInputs() {
             row.innerHTML = labelHtml + `
         <div class="score-input-wrap admin-vs">
           <input type="number" class="input-field score-input"
-                 data-player="${name}" value="0" step="1" />
+                 data-player="${name}" value="0" step="1" min="0" />
           <select class="input-field outcome-select" data-player="${name}" onchange="onOutcomeChange(this)">
             <option value="win">Thua</option>
             <option value="draw" selected>Hòa</option>
@@ -314,6 +328,10 @@ async function submitRoundAdmin() {
             const raw = parseInt(input.value);
             if (isNaN(raw) || !Number.isInteger(raw)) {
                 showError(`Điểm phải là số nguyên cho ${name}`);
+                return;
+            }
+            if (raw < 0) {
+                showError(`Điểm cược không thể nhỏ hơn 0 cho ${name}`);
                 return;
             }
             amount = Math.abs(raw);
