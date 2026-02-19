@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🃏 Card Scoring</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body data-page="game">
+
+<!-- Top bar -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">🃏</span>
+    <span class="topbar-title">Card Scoring</span>
+    <span class="topbar-code" id="game-code-label"></span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-ghost btn-sm" onclick="toggleSummary()">📊 Tổng kết</button>
+    <button class="btn btn-ghost btn-sm" onclick="undoRound()">↩ Hoàn tác</button>
+    <button class="btn btn-danger btn-sm" onclick="resetGame()">🔄 Reset</button>
+  </div>
+</div>
+
+<div class="game-layout">
+
+  <!-- LEFT: Scoring form -->
+  <div class="game-left">
+    <div class="card scoring-card">
+      <div class="round-header">
+        <div class="round-badge" id="round-badge">Lượt 1</div>
+        <div class="admin-badge hidden" id="admin-badge">👑 Admin: <span id="admin-name-label"></span></div>
+      </div>
+
+      <!-- Manual admin selector -->
+      <div id="manual-admin-section" class="form-group hidden">
+        <label>Chọn Admin lượt này</label>
+        <select id="manual-admin-select" class="input-field" onchange="onManualAdminChange()"></select>
+      </div>
+
+      <!-- Scoring inputs -->
+      <div id="scoring-inputs"></div>
+
+      <!-- Error -->
+      <div id="score-error" class="error-box hidden"></div>
+
+      <!-- Action buttons -->
+      <div id="admin-actions" class="action-group hidden">
+        <button class="btn btn-primary btn-full" onclick="submitRoundAdmin()">✅ Ghi lượt</button>
+      </div>
+      <div id="no-admin-actions" class="action-group hidden">
+        <button class="btn btn-primary btn-full" onclick="submitRoundNoAdmin()">✅ Ghi lượt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Round history table -->
+  <div class="game-right">
+    <div class="card history-card">
+      <h3 class="section-title">📋 Lịch sử lượt chơi</h3>
+      <div class="table-wrapper">
+        <table id="history-table">
+          <thead id="history-thead"></thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+        <div id="history-empty" class="empty-hint">Chưa có lượt nào...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary overlay -->
+<div id="summary-overlay" class="overlay hidden" onclick="closeSummaryOnBg(event)">
+  <div class="overlay-card">
+    <div class="overlay-header">
+      <h2>📊 Bảng Tổng Kết</h2>
+      <button class="btn btn-ghost btn-sm" onclick="toggleSummary()">✕</button>
+    </div>
+    <table id="summary-table" class="summary-table">
+      <thead>
+        <tr>
+          <th style="width:48px">#</th>
+          <th>Người chơi</th>
+          <th>Điểm</th>
+        </tr>
+      </thead>
+      <tbody id="summary-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="/static/main.js"></script>
+</body>
+</html>
