@@ -1,118 +1,124 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🃏 Card Scoring</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
-  <link rel="stylesheet" href="/static/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🃏 Card Scoring</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+    <link rel="stylesheet" href="/static/style.css" />
 </head>
+
 <body data-page="setup">
 
-<!-- Top bar -->
-<div class="topbar">
-  <div class="topbar-left">
-    <span class="topbar-logo">🃏</span>
-    <span class="topbar-title">Card Scoring</span>
-  </div>
-  <div class="topbar-right"></div>
-</div>
-
-<div class="setup-page">
-  <div class="hero">
-    <div class="hero-badge">🃏</div>
-    <h1 class="hero-title">Card Scoring</h1>
-    <p class="hero-sub">Tính điểm đánh bài nhanh chóng &amp; dễ dàng</p>
-  </div>
-
-  <div class="card setup-card">
-    <h2 class="section-title">⚙️ Cài đặt trò chơi</h2>
-
-  <!-- Join existing game -->
-  <div class="form-group">
-    <label>Tham gia ván</label>
-    <div class="inline-group">
-      <input type="text" id="join-code" class="input-field" placeholder="Nhập mã ván" maxlength="8" />
-      <button class="btn btn-ghost" onclick="joinGame()">Tham gia</button>
-    </div>
-    <div class="form-hint">Nhập mã ván để vào lại hoặc cùng chơi với nhóm khác.</div>
-  </div>
-
-  <!-- Player count -->
-  <div class="form-group">
-    <label for="player-count">Số người chơi</label>
-    <div class="count-control">
-      <button class="count-btn" id="count-dec" onclick="changeCount(-1)">−</button>
-      <span id="player-count-display">4</span>
-      <button class="count-btn" id="count-inc" onclick="changeCount(1)">+</button>
-    </div>
-  </div>
-
-  <!-- Player names & initial scores -->
-  <div class="form-group">
-    <label>Người chơi &amp; điểm ban đầu</label>
-    <div id="player-inputs"></div>
-  </div>
-
-  <!-- Admin mode -->
-  <div class="form-group">
-    <label>Chế độ Admin</label>
-    <div class="radio-group" id="admin-mode-group">
-      <label class="radio-card">
-        <input type="radio" name="admin-mode" value="none" checked onchange="onAdminModeChange()" />
-        <span class="radio-label">
-          <strong>Không có Admin</strong>
-          <small>Tổng điểm mỗi lượt phải = 0</small>
-        </span>
-      </label>
-      <label class="radio-card">
-        <input type="radio" name="admin-mode" value="fixed" onchange="onAdminModeChange()" />
-        <span class="radio-label">
-          <strong>Admin cố định</strong>
-          <small>Một người làm Admin suốt game</small>
-        </span>
-      </label>
-      <label class="radio-card">
-        <input type="radio" name="admin-mode" value="rotating" onchange="onAdminModeChange()" />
-        <span class="radio-label">
-          <strong>Xoay vòng</strong>
-          <small>Admin đổi sau mỗi X lượt</small>
-        </span>
-      </label>
-      <label class="radio-card">
-        <input type="radio" name="admin-mode" value="manual" onchange="onAdminModeChange()" />
-        <span class="radio-label">
-          <strong>Chọn thủ công</strong>
-          <small>Chọn Admin mỗi lượt</small>
-        </span>
-      </label>
+    <!-- Top bar -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <a class="topbar-home" href="/setup" aria-label="Card Scoring - Home">
+                <span class="topbar-logo">🃏</span>
+                <span class="topbar-title">Card Scoring</span>
+            </a>
+        </div>
+        <div class="topbar-right"></div>
     </div>
 
-    <!-- Admin sub-options -->
-    <div id="admin-sub-fixed" class="admin-sub hidden">
-      <label>Admin mặc định</label>
-      <select id="fixed-admin-select" class="input-field"></select>
-    </div>
-    <div id="admin-sub-rotating" class="admin-sub hidden">
-      <label>Đổi admin sau mỗi</label>
-      <div class="inline-group">
-        <input type="number" id="rotating-every" class="input-field small" value="1" min="1" max="20" />
-        <span class="inline-label">lượt</span>
-      </div>
-      <label style="margin-top:8px;">Admin đầu tiên</label>
-      <select id="rotating-start-select" class="input-field"></select>
-    </div>
-  </div>
+    <div class="setup-page">
+        <div class="hero">
+            <div class="hero-badge">🃏</div>
+            <h1 class="hero-title">Card Scoring</h1>
+            <p class="hero-sub">Tính điểm đánh bài nhanh chóng &amp; dễ dàng</p>
+        </div>
 
-    <button class="btn btn-primary btn-full" onclick="startGame()">
-      🚀 Bắt đầu chơi
-    </button>
-  </div>
-</div>
+        <div class="card setup-card">
+            <h2 class="section-title">⚙️ Cài đặt trò chơi</h2>
 
-<script src="/static/main.js"></script>
+            <!-- Join existing game -->
+            <div class="form-group">
+                <label>Tham gia ván</label>
+                <div class="inline-group">
+                    <input type="text" id="join-code" class="input-field" placeholder="Nhập mã ván" maxlength="8" />
+                    <button class="btn btn-ghost" onclick="joinGame()">Tham gia</button>
+                </div>
+                <div class="form-hint">Nhập mã ván để trở lại.</div>
+            </div>
+
+            <!-- Player count -->
+            <div class="form-group">
+                <label for="player-count">Số người chơi</label>
+                <div class="count-control">
+                    <button class="count-btn" id="count-dec" onclick="changeCount(-1)">−</button>
+                    <span id="player-count-display">4</span>
+                    <button class="count-btn" id="count-inc" onclick="changeCount(1)">+</button>
+                </div>
+            </div>
+
+            <!-- Player names & initial scores -->
+            <div class="form-group">
+                <label>Người chơi &amp; điểm ban đầu</label>
+                <div id="player-inputs"></div>
+            </div>
+
+            <!-- Admin mode -->
+            <div class="form-group">
+                <label>Chế độ Admin</label>
+                <div class="radio-group" id="admin-mode-group">
+                    <label class="radio-card">
+                        <input type="radio" name="admin-mode" value="none" checked onchange="onAdminModeChange()" />
+                        <span class="radio-label">
+                            <strong>Không có Admin</strong>
+                            <small>Tổng điểm mỗi lượt phải = 0</small>
+                        </span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="admin-mode" value="fixed" onchange="onAdminModeChange()" />
+                        <span class="radio-label">
+                            <strong>Admin cố định</strong>
+                            <small>Một người làm Admin suốt game</small>
+                        </span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="admin-mode" value="rotating" onchange="onAdminModeChange()" />
+                        <span class="radio-label">
+                            <strong>Xoay vòng</strong>
+                            <small>Admin đổi sau mỗi X lượt</small>
+                        </span>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="admin-mode" value="manual" onchange="onAdminModeChange()" />
+                        <span class="radio-label">
+                            <strong>Chọn thủ công</strong>
+                            <small>Chọn Admin mỗi lượt</small>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Admin sub-options -->
+                <div id="admin-sub-fixed" class="admin-sub hidden">
+                    <label>Admin mặc định</label>
+                    <select id="fixed-admin-select" class="input-field"></select>
+                </div>
+                <div id="admin-sub-rotating" class="admin-sub hidden">
+                    <label>Đổi admin sau mỗi</label>
+                    <div class="inline-group">
+                        <input type="number" id="rotating-every" class="input-field small" value="1" min="1" max="20" />
+                        <span class="inline-label">lượt</span>
+                    </div>
+                    <label style="margin-top:8px;">Admin đầu tiên</label>
+                    <select id="rotating-start-select" class="input-field"></select>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-full" onclick="startGame()">
+                🚀 Bắt đầu chơi
+            </button>
+        </div>
+    </div>
+
+    <script src="/static/main.js"></script>
 </body>
+
 </html>

@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  card-scoring:
+    build: .
+    ports:
+      - "${PORT:-2001}:2001"
+    env_file:
+      - .env
+    restart: unless-stopped

@@ -252,6 +252,14 @@ select.input-field option { background: #1e2135; }
 .topbar-left { display: flex; align-items: center; gap: 10px; }
 .topbar-logo { font-size: 1.4rem; }
 .topbar-title { font-weight: 700; font-size: 1.1rem; }
+.topbar-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.topbar-home:hover .topbar-title { color: var(--accent2); }
 .topbar-code {
   font-size: 0.82rem;
   color: var(--text-muted);
