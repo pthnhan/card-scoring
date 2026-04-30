@@ -1,0 +1,67 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: card-scoring-deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Validate required settings
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_USER: ${{ vars.VPS_USER }}
+          CARD_SCORING_APP_DIR: ${{ vars.CARD_SCORING_APP_DIR }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -eu
+          [ -n "${VPS_HOST}" ] || { echo "Missing variable: VPS_HOST"; exit 1; }
+          [ -n "${VPS_USER}" ] || { echo "Missing variable: VPS_USER"; exit 1; }
+          [ -n "${CARD_SCORING_APP_DIR}" ] || { echo "Missing variable: CARD_SCORING_APP_DIR"; exit 1; }
+          [ -n "${VPS_SSH_KEY}" ] || { echo "Missing secret: VPS_SSH_KEY"; exit 1; }
+
+      - name: Configure SSH
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          set -eu
+          SSH_PORT="${VPS_PORT:-22}"
+          mkdir -p "${HOME}/.ssh"
+          chmod 700 "${HOME}/.ssh"
+          printf '%s\n' "${VPS_SSH_KEY}" > "${HOME}/.ssh/id_ed25519"
+          chmod 600 "${HOME}/.ssh/id_ed25519"
+
+          if [ -n "${VPS_KNOWN_HOSTS}" ]; then
+            printf '%s\n' "${VPS_KNOWN_HOSTS}" > "${HOME}/.ssh/known_hosts"
+          else
+            ssh-keyscan -p "${SSH_PORT}" -H "${VPS_HOST}" >> "${HOME}/.ssh/known_hosts"
+          fi
+
+      - name: Deploy on server
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+          VPS_USER: ${{ vars.VPS_USER }}
+          CARD_SCORING_APP_DIR: ${{ vars.CARD_SCORING_APP_DIR }}
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+        run: |
+          set -eu
+          SSH_PORT="${VPS_PORT:-22}"
+          ssh \
+            -i "${HOME}/.ssh/id_ed25519" \
+            -p "${SSH_PORT}" \
+            -o StrictHostKeyChecking=yes \
+            "${VPS_USER}@${VPS_HOST}" \
+            "cd '${CARD_SCORING_APP_DIR}' && DEPLOY_BRANCH='${DEPLOY_BRANCH}' sh deploy.sh"
