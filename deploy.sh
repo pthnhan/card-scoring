@@ -11,15 +11,14 @@ COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-card-scoring}"
 export COMPOSE_PROJECT_NAME
 
 compose() {
-    if docker compose version >/dev/null 2>&1; then
-        docker compose "$@"
-    elif command -v docker-compose >/dev/null 2>&1; then
-        docker-compose "$@"
-    else
-        echo "Docker Compose is required. Install the Docker Compose plugin or docker-compose."
-        exit 1
-    fi
+    docker compose "$@"
 }
+
+if ! docker compose version >/dev/null 2>&1; then
+    echo "Docker Compose v2 is required."
+    echo "Install the Docker Compose plugin on the VPS, then rerun deploy.sh."
+    exit 1
+fi
 
 if ! command -v git >/dev/null 2>&1; then
     echo "git not found on PATH"
@@ -42,8 +41,11 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
+echo "Stopping existing Docker Compose services..."
+compose down --remove-orphans || true
+
 echo "Building and starting Docker Compose services..."
-compose up --build -d
+compose up --build -d --remove-orphans
 
 echo "Current service status:"
 compose ps
