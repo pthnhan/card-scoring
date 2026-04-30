@@ -14,6 +14,15 @@ const COLORS = [
     { bg: '#a3e63522', text: '#bef264', solid: '#a3e635' },
 ];
 function playerColor(i) { return COLORS[i % COLORS.length]; }
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+    }[ch]));
+}
 function initials(name) {
     return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2) || '?';
 }
@@ -59,17 +68,19 @@ function renderPlayerInputs() {
         const c = playerColor(i);
         const row = document.createElement('div');
         row.className = 'player-row';
+        const nameValue = escapeHtml((oldData[i] && oldData[i].name) || `P${i + 1}`);
+        const scoreValue = escapeHtml((oldData[i] && oldData[i].score) || 0);
         row.innerHTML = `
       <div class="player-avatar" style="background:${c.bg};color:${c.text}">P${i + 1}</div>
       <input type="text"
              class="input-field player-name-input"
              placeholder="Người chơi ${i + 1}"
-             value="${(oldData[i] && oldData[i].name) || `P${i + 1}`}"
+             value="${nameValue}"
              oninput="syncAdminSelects()" />
       <input type="number"
              class="input-field player-score-input"
              placeholder="0"
-             value="${(oldData[i] && oldData[i].score) || 0}"
+             value="${scoreValue}"
              style="width:88px;text-align:center;" />
     `;
         container.appendChild(row);
@@ -99,8 +110,8 @@ function syncAdminSelects() {
     ['fixed-admin-select', 'rotating-start-select'].forEach(id => {
         const sel = document.getElementById(id);
         const prev = sel.value;
-        sel.innerHTML = names.map((n, i) => `<option value="${i}">${n}</option>`).join('');
-        if (names.includes(prev)) sel.value = prev;
+        sel.innerHTML = names.map((n, i) => `<option value="${i}">${escapeHtml(n)}</option>`).join('');
+        if (Number.isInteger(parseInt(prev)) && parseInt(prev) < names.length) sel.value = prev;
     });
 }
 
@@ -191,7 +202,7 @@ function updateAdminBadge() {
         sec.classList.remove('hidden');
         const sel = document.getElementById('manual-admin-select');
         const prev = manualAdminSelected || sel.value;
-        sel.innerHTML = state.players.map(n => `<option value="${n}">${n}</option>`).join('');
+        sel.innerHTML = state.players.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
         if (prev && state.players.includes(prev)) {
             sel.value = prev;
         } else {
@@ -203,7 +214,7 @@ function updateAdminBadge() {
         const sec = document.getElementById('manual-admin-section');
         sec.classList.remove('hidden');
         const sel = document.getElementById('manual-admin-select');
-        sel.innerHTML = state.players.map(n => `<option value="${n}">${n}</option>`).join('');
+        sel.innerHTML = state.players.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
         sel.value = state.next_admin || state.players[0] || '';
         currentAdminSelected = sel.value;
         label.textContent = currentAdminSelected || '—';
@@ -243,8 +254,8 @@ function refreshScoringInputs() {
 
         const labelHtml = `
       <div class="score-player-label">
-        <div class="score-avatar" style="background:${c.bg};color:${c.text}">${initials(name)}</div>
-        <span>${name}</span>
+        <div class="score-avatar" style="background:${c.bg};color:${c.text}">${escapeHtml(initials(name))}</div>
+        <span>${escapeHtml(name)}</span>
       </div>`;
 
         if (isAdmin) {
@@ -253,15 +264,15 @@ function refreshScoringInputs() {
             row.innerHTML = labelHtml + `
         <div class="score-input-wrap">
           <input type="number" class="input-field score-input"
-                 id="score-${i}" data-player="${name}"
+                 id="score-${i}" data-player="${escapeHtml(name)}"
                  value="0" step="1" />
         </div>`;
         } else {
             row.innerHTML = labelHtml + `
         <div class="score-input-wrap admin-vs">
           <input type="number" class="input-field score-input"
-                 data-player="${name}" value="0" step="1" min="0" />
-          <select class="input-field outcome-select" data-player="${name}" onchange="onOutcomeChange(this)">
+                 data-player="${escapeHtml(name)}" value="0" step="1" min="0" />
+          <select class="input-field outcome-select" data-player="${escapeHtml(name)}" onchange="onOutcomeChange(this)">
             <option value="win">Thua</option>
             <option value="draw" selected>Hòa</option>
             <option value="lose">Thắng</option>
@@ -408,7 +419,7 @@ function renderHistoryTable() {
     let headerHtml = '<tr><th>Lượt</th>';
     players.forEach((name, i) => {
         const c = playerColor(i);
-        headerHtml += `<th><span style="color:${c.text}">${name}</span></th>`;
+        headerHtml += `<th><span style="color:${c.text}">${escapeHtml(name)}</span></th>`;
     });
     headerHtml += '</tr>';
     thead.innerHTML = headerHtml;
@@ -434,7 +445,7 @@ function renderHistoryTable() {
     let runningMap = { ...initials_map };
 
     rounds.forEach((rnd, idx) => {
-        const adminMark = rnd.admin ? `<div class="admin-badge" style="display:inline-block;margin-top:4px;font-size:0.72rem;">👑 ${rnd.admin}</div>` : '';
+        const adminMark = rnd.admin ? `<div class="admin-badge" style="display:inline-block;margin-top:4px;font-size:0.72rem;">👑 ${escapeHtml(rnd.admin)}</div>` : '';
         bodyHtml += `<tr>
       <td class="td-round">${idx + 1}${adminMark ? '<br>' + adminMark : ''}</td>`;
         players.forEach(name => {
@@ -481,9 +492,9 @@ function renderSummaryTable() {
       <tr>
         <td><div class="rank-badge ${rankClass}">${rank + 1}</div></td>
         <td>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div class="chip-avatar" style="background:${c.bg};color:${c.text}">${initials(name)}</div>
-            <span class="summary-name">${name}</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+            <div class="chip-avatar" style="background:${c.bg};color:${c.text}">${escapeHtml(initials(name))}</div>
+            <span class="summary-name">${escapeHtml(name)}</span>
           </div>
         </td>
         <td class="summary-score ${cls}">${t > 0 ? '+' : ''}${t}</td>
