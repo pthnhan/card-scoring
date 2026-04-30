@@ -263,9 +263,10 @@ function refreshScoringInputs() {
         } else if (!hasAdmin) {
             row.innerHTML = labelHtml + `
         <div class="score-input-wrap">
-          <input type="number" class="input-field score-input"
+          <input type="text" class="input-field score-input"
                  id="score-${i}" data-player="${escapeHtml(name)}"
-                 value="0" step="1" />
+                 value="0" inputmode="text" pattern="-?[0-9]*"
+                 autocomplete="off" autocorrect="off" enterkeyhint="done" />
         </div>`;
         } else {
             row.innerHTML = labelHtml + `
@@ -372,11 +373,12 @@ function collectScores(skipPlayer = null) {
     for (const inp of inputs) {
         const name = inp.dataset.player;
         if (name === skipPlayer) continue;
-        const val = parseInt(inp.value);
-        if (isNaN(val) || !Number.isInteger(val)) {
+        const value = inp.value.trim();
+        if (!/^-?\d+$/.test(value)) {
             showError(`Điểm phải là số nguyên cho ${name}`);
             return null;
         }
+        const val = Number(value);
         scores[name] = val;
     }
     return scores;
